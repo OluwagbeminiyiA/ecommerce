@@ -9,10 +9,19 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class UserAssembler implements RepresentationModelAssembler<User, EntityModel<User>> {
+public class UserAssembler implements RepresentationModelAssembler<User, EntityModel<UserView>> {
     @Override
-    public EntityModel<User> toModel(User user) {
-        return EntityModel.of(user,
+    public EntityModel<UserView> toModel(User user) {
+
+        UserView userView = new UserView();
+
+        userView.setId(user.getId());
+        userView.setName(user.getName());
+        userView.setEmail(user.getEmail());
+        userView.setRole(user.getRole());
+        userView.setCreatedAt(user.getCreatedAt());
+
+        return EntityModel.of(userView,
                 linkTo(methodOn(UserController.class).findOne(user.getId())).withSelfRel(),
                 linkTo(methodOn(UserController.class).findAll()).withRel("Users"));
     }

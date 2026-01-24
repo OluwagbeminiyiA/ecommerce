@@ -3,6 +3,7 @@ package com.example.ecommerce.user;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,15 +16,17 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class UserController {
     private final UserRepository userRepository;
     private final UserAssembler assembler;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserRepository userRepository, UserAssembler assembler) {
+    public UserController(UserRepository userRepository, UserAssembler assembler, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.assembler = assembler;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/users")
-    CollectionModel<EntityModel<User>> findAll() {
-        List<EntityModel<User>> users = userRepository.findAll()
+    CollectionModel<EntityModel<UserView>> findAll() {
+        List<EntityModel<UserView>> users = userRepository.findAll()
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
@@ -32,13 +35,18 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    EntityModel<User> findOne(@PathVariable Long id) {
+    EntityModel<UserView> findOne(@PathVariable Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         return assembler.toModel(user);
     }
 
     @PostMapping("/users")
-    ResponseEntity<EntityModel<User>> save(@RequestBody User newUser) {
+        ResponseEntity<EntityModel<UserView>> save(@RequestBody User newUser) {
+        if (newUser.getPassword() == null || newUser.getPassword().trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        String password = passwordEncoder.encode(newUser.getPassword());
+        newUser.setPassword(password);
         User savedUser = userRepository.save(newUser);
 
         return ResponseEntity

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,12 +46,21 @@ public class UserController {
         if (newUser.getPassword() == null || newUser.getPassword().trim().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
+
+        if (userRepository.existsByEmail(newUser.getEmail())) {
+            return ResponseEntity.badRequest().build();
+        }
         String password = passwordEncoder.encode(newUser.getPassword());
         newUser.setPassword(password);
+
+        newUser.setCreatedAt(LocalDateTime.now());
+
         User savedUser = userRepository.save(newUser);
 
+
+
         return ResponseEntity
-                .created(linkTo(methodOn(UserController.class)).toUri())
+                .created(linkTo(methodOn(UserController.class).findOne(savedUser.getId())).toUri())
                 .body(assembler.toModel(savedUser));
     }
 

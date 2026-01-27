@@ -1,16 +1,33 @@
 package com.example.ecommerce.user;
-
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
 public class UserView {
         private Long id;
     private String name;
     private String email;
     private Role role;
     private LocalDateTime createdAt;
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
 }

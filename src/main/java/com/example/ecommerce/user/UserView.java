@@ -2,7 +2,7 @@ package com.example.ecommerce.user;
 import java.time.LocalDateTime;
 
 public class UserView {
-        private Long id;
+    private Long id;
     private String name;
     private String email;
     private Role role;
@@ -30,4 +30,23 @@ public class UserView {
         this.role = role;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 }

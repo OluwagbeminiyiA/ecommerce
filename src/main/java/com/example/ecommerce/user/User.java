@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "users")
-class User {
+public class User {
     private @Id @GeneratedValue Long id;
     private String name;
     private String email;

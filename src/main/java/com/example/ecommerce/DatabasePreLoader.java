@@ -28,8 +28,8 @@ public class DatabasePreLoader {
 
             logger.info("Finished Loading Users...");
 
-            productRepository.save(new Product("Laptop", "High performance laptop", BigDecimal.valueOf(1200.00), 50L, "Electronics", LocalDateTime.now()));
-            productRepository.save(new Product("Smartphone", "Latest model smartphone", BigDecimal.valueOf(800.00), 100L, "Electronics", LocalDateTime.now()));
+            productRepository.save(new Product("Laptop", "High performance laptop", BigDecimal.valueOf(1200.00), 50L, "Electronics", LocalDateTime.now(), LocalDateTime.now()));
+            productRepository.save(new Product("Smartphone", "Latest model smartphone", BigDecimal.valueOf(800.00), 100L, "Electronics", LocalDateTime.now(), LocalDateTime.now()));
             logger.info("Preloaded products into the database.");
         };
     }

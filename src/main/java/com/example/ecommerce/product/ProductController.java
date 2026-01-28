@@ -43,11 +43,60 @@ public class ProductController {
     ResponseEntity<EntityModel<ProductView>> saveProduct(@RequestBody Product newProduct){
 
         newProduct.setCreatedAt(LocalDateTime.now());
+        newProduct.setUpdatedAt(LocalDateTime.now());
         Product savedProduct = productRepository.save(newProduct);
 
         return ResponseEntity
                 .created(linkTo(methodOn(ProductController.class).findOne(savedProduct.getId())).toUri())
                 .body(productAssembler.toModel(savedProduct));
     }
+
+    @PutMapping("/products/{id}")
+    ResponseEntity<?> update(@RequestBody Product newProduct, @PathVariable Long id) {
+        Product oldProduct = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
+
+        if (newProduct.getName() != null && !newProduct.getName().isBlank()) {
+            oldProduct.setName(newProduct.getName());
+            oldProduct.setUpdatedAt(LocalDateTime.now());
+        }
+
+        if (newProduct.getCategory() != null && !newProduct.getCategory().isBlank()) {
+            oldProduct.setCategory(newProduct.getCategory());
+            oldProduct.setUpdatedAt(LocalDateTime.now());
+
+        }
+
+        if (newProduct.getPrice() != null) {
+            oldProduct.setPrice(newProduct.getPrice());
+            oldProduct.setUpdatedAt(LocalDateTime.now());
+
+        }
+
+        if (newProduct.getStockQuantity() != null) {
+            oldProduct.setStockQuantity(newProduct.getStockQuantity());
+            oldProduct.setUpdatedAt(LocalDateTime.now());
+
+        }
+
+        if (newProduct.getDescription() != null && !newProduct.getDescription().isBlank()){
+            oldProduct.setDescription(newProduct.getDescription());
+            oldProduct.setUpdatedAt(LocalDateTime.now());
+        }
+
+        Product saved = productRepository.save(oldProduct);
+
+        return ResponseEntity
+                .ok(saved);
+    }
+
+    @DeleteMapping("/products/{id}")
+    ResponseEntity<?> delete(@PathVariable Long id){
+        Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
+
+        productRepository.delete(product);
+
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

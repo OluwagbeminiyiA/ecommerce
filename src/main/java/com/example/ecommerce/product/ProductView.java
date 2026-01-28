@@ -10,6 +10,7 @@ public class ProductView {
     private BigDecimal price;
     private Long stockQuantity;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public void setId(Long id) {
         this.id = id;
@@ -57,5 +58,13 @@ public class ProductView {
 
     public LocalDateTime getCreatedAt() {
         return this.createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

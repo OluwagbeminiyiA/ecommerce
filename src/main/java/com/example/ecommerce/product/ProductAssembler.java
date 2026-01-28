@@ -20,6 +20,7 @@ public class ProductAssembler implements RepresentationModelAssembler<Product, E
         productView.setName(entity.getName());
         productView.setPrice(entity.getPrice());
         productView.setStockQuantity(entity.getStockQuantity());
+        productView.setUpdatedAt(entity.getUpdatedAt());
 
         return EntityModel.of(productView,
                 linkTo(methodOn(ProductController.class).findOne(productView.getId())).withSelfRel(),

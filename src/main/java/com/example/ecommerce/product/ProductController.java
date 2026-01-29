@@ -1,7 +1,12 @@
 package com.example.ecommerce.product;
 
+import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,21 +21,26 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ProductController {
     private final ProductRepository productRepository;
     private final ProductAssembler productAssembler;
+    private final PagedResourcesAssembler<ProductView> pagedResourceAssembler;
 
-    public ProductController(ProductRepository productRepository, ProductAssembler productAssembler) {
+    public ProductController(ProductRepository productRepository, ProductAssembler productAssembler, PagedResourcesAssembler<ProductView> pagedResourceAssembler) {
         this.productRepository = productRepository;
         this.productAssembler = productAssembler;
+        this.pagedResourceAssembler = pagedResourceAssembler;
     }
 
 
-    @GetMapping("/products")
-    CollectionModel<EntityModel<ProductView>> findAll() {
-        List<EntityModel<ProductView>> products = productRepository.findAll()
-                .stream()
-                .map(productAssembler::toModel)
-                .collect(Collectors.toList());
 
-        return CollectionModel.of(products);
+    @GetMapping("/products")
+    PagedModel<EntityModel<ProductView>> findAll(Pageable pageable){
+        Page<Product> page = productRepository.findAll(pageable);
+
+        Page<ProductView> productViewPage = page.map(
+                ProductView::new
+        );
+
+        return pagedResourceAssembler
+                .toModel(productViewPage);
     }
 
     @GetMapping("/products/{id}")
@@ -39,6 +49,7 @@ public class ProductController {
         return productAssembler.toModel(product);
     }
 
+    @Transactional
     @PostMapping("/products")
     ResponseEntity<EntityModel<ProductView>> saveProduct(@RequestBody Product newProduct){
 
@@ -51,7 +62,8 @@ public class ProductController {
                 .body(productAssembler.toModel(savedProduct));
     }
 
-    @PutMapping("/products/{id}")
+    @Transactional
+    @PatchMapping("/products/{id}")
     ResponseEntity<?> update(@RequestBody Product newProduct, @PathVariable Long id) {
         Product oldProduct = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
 

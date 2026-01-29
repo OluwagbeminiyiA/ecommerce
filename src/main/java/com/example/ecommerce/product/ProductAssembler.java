@@ -1,8 +1,12 @@
 package com.example.ecommerce.product;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
+
+import java.awt.print.Pageable;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -12,18 +16,11 @@ public class ProductAssembler implements RepresentationModelAssembler<Product, E
 
     @Override
     public EntityModel<ProductView> toModel(Product entity) {
-        ProductView productView = new ProductView();
+        ProductView productView = new ProductView(entity);
 
-        productView.setId(entity.getId());
-        productView.setCreatedAt(entity.getCreatedAt());
-        productView.setDescription(entity.getDescription());
-        productView.setName(entity.getName());
-        productView.setPrice(entity.getPrice());
-        productView.setStockQuantity(entity.getStockQuantity());
-        productView.setUpdatedAt(entity.getUpdatedAt());
 
         return EntityModel.of(productView,
                 linkTo(methodOn(ProductController.class).findOne(productView.getId())).withSelfRel(),
-                linkTo(methodOn(ProductController.class).findAll()).withRel("products"));
+                linkTo(methodOn(ProductController.class).findAll(PageRequest.of(0, 10))).withRel("products"));
     }
 }

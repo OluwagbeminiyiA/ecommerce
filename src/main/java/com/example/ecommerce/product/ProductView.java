@@ -12,6 +12,16 @@ public class ProductView {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    public ProductView(Product product) {
+        this.id = product.getId();
+        this.name = product.getName();
+        this.description = product.getDescription();
+        this.price = product.getPrice();
+        this.stockQuantity = product.getStockQuantity();
+        this.createdAt = product.getCreatedAt();
+        this.updatedAt = product.getUpdatedAt();
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -67,4 +77,6 @@ public class ProductView {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+
 }

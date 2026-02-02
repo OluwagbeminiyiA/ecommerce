@@ -1,13 +1,18 @@
 package com.example.ecommerce.product;
 
+import com.example.ecommerce.category.Category;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProductView {
     private Long id;
     private String name;
     private String description;
     private BigDecimal price;
+    private List<ProductCategory> categories;
     private Long stockQuantity;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -20,6 +25,7 @@ public class ProductView {
         this.stockQuantity = product.getStockQuantity();
         this.createdAt = product.getCreatedAt();
         this.updatedAt = product.getUpdatedAt();
+        this.categories = product.getCategories();
     }
 
     public void setId(Long id) {
@@ -76,6 +82,14 @@ public class ProductView {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<ProductCategory> getCategories() {
+        return this.categories;
+    }
+
+    public void setCategories(List<ProductCategory> categories) {
+        this.categories = categories;
     }
 
 

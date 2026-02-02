@@ -1,5 +1,7 @@
 package com.example.ecommerce.product;
 
+import com.example.ecommerce.category.Category;
+import com.example.ecommerce.category.CategoryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,11 +24,13 @@ public class ProductController {
     private final ProductRepository productRepository;
     private final ProductAssembler productAssembler;
     private final PagedResourcesAssembler<ProductView> pagedResourceAssembler;
+    private final CategoryRepository categoryRepository;
 
-    public ProductController(ProductRepository productRepository, ProductAssembler productAssembler, PagedResourcesAssembler<ProductView> pagedResourceAssembler) {
+    public ProductController(ProductRepository productRepository, ProductAssembler productAssembler, PagedResourcesAssembler<ProductView> pagedResourceAssembler, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
         this.productAssembler = productAssembler;
         this.pagedResourceAssembler = pagedResourceAssembler;
+        this.categoryRepository = categoryRepository;
     }
 
 
@@ -51,11 +55,26 @@ public class ProductController {
 
     @Transactional
     @PostMapping("/products")
-    ResponseEntity<EntityModel<ProductView>> saveProduct(@RequestBody Product newProduct){
+    ResponseEntity<EntityModel<ProductView>> saveProduct(@RequestBody ProductCreateRequest newProductRequest){
 
-        newProduct.setCreatedAt(LocalDateTime.now());
-        newProduct.setUpdatedAt(LocalDateTime.now());
-        Product savedProduct = productRepository.save(newProduct);
+        Product product = new Product(
+                newProductRequest.getName(),
+                newProductRequest.getDescription(),
+                newProductRequest.getPrice(),
+                newProductRequest.getStockQuantity(),
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+        for(String str: newProductRequest.getCategory()){
+            Category category = categoryRepository.findByName(str).orElseGet(()-> categoryRepository.save(new Category(str)));
+
+            ProductCategory productCategory = new ProductCategory(product, category);
+
+            product.getCategories().add(productCategory);
+            category.getProducts().add(productCategory);
+        }
+
+        Product savedProduct = productRepository.save(product);
 
         return ResponseEntity
                 .created(linkTo(methodOn(ProductController.class).findOne(savedProduct.getId())).toUri())
@@ -63,7 +82,7 @@ public class ProductController {
     }
 
     @Transactional
-    @PatchMapping("/products/{id}")
+    @RequestMapping(value = "/products/{id}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     ResponseEntity<?> update(@RequestBody Product newProduct, @PathVariable Long id) {
         Product oldProduct = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
 
@@ -72,10 +91,8 @@ public class ProductController {
             oldProduct.setUpdatedAt(LocalDateTime.now());
         }
 
-        if (newProduct.getCategory() != null && !newProduct.getCategory().isBlank()) {
-            oldProduct.setCategory(newProduct.getCategory());
-            oldProduct.setUpdatedAt(LocalDateTime.now());
-
+        if (newProduct.getCategories() != null && !newProduct.getCategories().isEmpty()) {
+            oldProduct.getCategories().addAll(newProduct.getCategories());
         }
 
         if (newProduct.getPrice() != null) {

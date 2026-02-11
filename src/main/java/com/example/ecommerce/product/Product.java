@@ -1,5 +1,6 @@
 package com.example.ecommerce.product;
 
+import com.example.ecommerce.user.User;
 import jakarta.persistence.*;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,6 +18,19 @@ public class Product {
     private String description;
     private BigDecimal price;
     private Long stockQuantity;
+    private BigDecimal discount;
+
+    public BigDecimal getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @OneToMany(mappedBy = "product",  cascade = CascadeType.ALL,  orphanRemoval = true)
     private List<ProductCategory> categories = new ArrayList<>();
@@ -108,6 +122,14 @@ public class Product {
         this.updatedAt = updatedAt;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Product product)) return false;
@@ -132,4 +154,6 @@ public class Product {
     public int hashCode() {
         return Objects.hash(id, name, description, price, stockQuantity, categories, createdAt, updatedAt);
     }
+
+
 }

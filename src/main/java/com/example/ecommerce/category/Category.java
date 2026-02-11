@@ -18,6 +18,7 @@ public class Category {
     @JsonIgnore
     private List<ProductCategory> products = new ArrayList<>();
 
+    @Column(unique = true)
     private String name;
 
     public Category() {}
